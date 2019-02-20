@@ -3,7 +3,7 @@
 
 If you're from a procedural language you might do the following:
 
-```javascript
+```js
 function startAnimation () {
   // ...
 }
@@ -16,7 +16,7 @@ function stopAnimation () {
 The next piece of code allows you to store state and have methods that can act on this state
 
 
-```javascript
+```js
 // Animation class
 
 var Animation = function () {
@@ -42,7 +42,7 @@ If you prefer doing it all in one declaration
 
 Animation class with a slightly different syntax for declaring methods
 
-```javascript
+```js
 var Animation = function () {
  // ...
 }
@@ -59,7 +59,7 @@ Animation.prototype = {
 
 Add a method to the Function object that can be use to declare methods
 
-```javascript
+```js
 Function.prototype.method = function (name, fn) {
   this.prototype[name] = fn
 } 
@@ -84,7 +84,7 @@ You can take this a step further by modifying `Function.prototype.method` to all
 
 This allows the calls to be chained
 
-```javascript
+```js
 Function.prototype.method = function (name, fn) {
   this.prototype[name] = fn
   return this
@@ -120,7 +120,7 @@ Primitive datatypes are passed by value, whereas all other datatypes are passed 
 Anonymous functions are those that are not given names
 An example of an anonymous function executed immediately
 
-```javascript
+```js
 (function () {
   var foo = 10
   var bar = 2
@@ -132,7 +132,7 @@ The above is defined and executed without ever being assigned to a variable.
 
 An anonymous function with arguments
 
-```javascript
+```js
 (function (foo, bar) {
   alert(foo * bar)
 })(10, 2)
@@ -142,7 +142,7 @@ Instead of assigning `foo` and `bar` inside the function, they are passed in as 
 
 You can also return a value from a function; below is an example:
 
-```javascript
+```js
 var baz = (function (foo, bar) {
   return foo * bar
 })(10, 2)
@@ -153,7 +153,7 @@ var baz = (function (foo, bar) {
 The most interesting use of anonymous functions is to create a closure; a protected variable space, created by nesting functions. In JavaScript, a variable defined within a function is not accessible outside of it; function-level scope. In addition, functions run in the scope they are defined in, not in the scope they are executed in; lexical-scope. These aspects of JavaScript can allow you to create private variables - by wrapping them in anonymous functions.
 
 An anonymous function used as a closure:
-```javascript
+```js
 var baz;
 
 (function () {
@@ -174,7 +174,7 @@ baz()
 In JavaScript everything is an object and everything is mutable
 This means you can give attributes to functions:
 
-```javascript
+```js
 function displayError (message) {
   displayError.numTimesExecuted++
   alert(message)
@@ -184,7 +184,7 @@ displayError.numTimesExecuted = 0
 
 It also means you can modify classes and objects after they have been created;
 
-```javascript
+```js
 //class Person
 function Person (name, age) {
   this.name = name
