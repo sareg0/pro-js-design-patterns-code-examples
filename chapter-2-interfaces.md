@@ -102,4 +102,50 @@ JavaScript lacks the `interface` and `implements` keywords, as well as run-time 
 
 ### Describing Interfaces with Comments
 
+```js
+// interface Composite {
+//   function add(child);
+//   function remove(child);
+//   function getChild(child);
+// }
+
+// interface FormItem {
+//   function save()
+// }
+
+var CompositeForm = function(id, method, action) {
+  // implements Composite, FormItem
+  // ...
+};
+
+// Implement the Composite interface.
+CompositeForm.prototype.add = function(child) {
+  // ...
+};
+
+CompositeForm.prototype.remove = function(child) {
+  // ...
+};
+
+CompositeForm.prototype.getChild = function(child) {
+  // ...
+};
+
+// Implement the FormItem interface
+CompositeForm.prototype.save = function() {
+  // ...
+};
+```
+
+#### Drawbacks of the above approach:
+- there is no checking to ensure CompositeForm actually does implement the correct set of methods. 
+- No errors are thrown. 
+- All compliance to the interface is voluntary.
+
+#### Advantages:
+- it's easy to implement
+- it promotes re-usability
+- it doesn't affect file size or execution speed
+- the comments can be stripped out when the code is deployed; eliminating any increase in file size.
+
 
