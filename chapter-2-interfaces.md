@@ -110,7 +110,7 @@ JavaScript lacks the `interface` and `implements` keywords, as well as run-time 
 // }
 
 // interface FormItem {
-//   function save()
+//   function save();
 // }
 
 var CompositeForm = function(id, method, action) {
@@ -147,5 +147,65 @@ CompositeForm.prototype.save = function() {
 - it promotes re-usability
 - it doesn't affect file size or execution speed
 - the comments can be stripped out when the code is deployed; eliminating any increase in file size.
+
+
+### Emulating Interfaces with Attribute Checking
+
+
+```js
+// interface Composite {
+//   function add(child);
+//   function remove(child);
+//   function getChild(child);
+// }
+
+// interface FormItem {
+//   function save();
+// }
+
+var CompositeForm = function(id, method, action) {
+  this.implementsInterfaces = ['Composite', 'FormItem'];
+  // ...
+}
+
+// ...
+
+function addForm(formInstance) {
+  if (!implements(formInstance, 'Composite', 'FormItem')) {
+    throw new Error("Object does not implement a required interface.");
+  }
+  // ...
+}
+
+// The implements function, which checks to see if an object declares that it implements the required interface
+
+function implements(object) {
+  for(var i = 1; i < arguments.length; i++) {
+    //Looping through all the arguments after the first one
+    var interfaceName = arguments[i];
+    var interfaceFound = false;
+    for(var j = 0; j < object.implementsInterfaces.length; j++) {
+      if(object.implementsInterfaces[j] === interfaceName) {
+        interfaceFound = true;
+        break;
+      }
+    }
+    if(!interfaceFound) {
+      return false; //An interface was not found
+    }
+  }
+  return true; //All interfaces were found
+}
+```
+
+#### Advantages:
+- you document which interfaces a class implements
+- you see errors if a class does not declare that it supports a required interface
+- you can enforce that other programmers declare these interfaces through the use of these errors
+
+#### Drawbacks:
+- you are not ensuring the class really implements this interface
+- easy to create a class that declares it implements an interface and then forget to add a method; checks will pass but the method will not be there, potentially causing problems in your code.
+- It added work to explicitly declare the interfaces a class supports.
 
 
