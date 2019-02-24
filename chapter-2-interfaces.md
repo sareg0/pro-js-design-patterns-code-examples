@@ -1,15 +1,15 @@
 "Program to an interface, not an implementation" - *Design Patterns* (Gang of Four)
 
-### What is an Interface?
+## What is an Interface?
 provides a way of specifying what methods an object should have
 
 
-#### Benefits of Using Interfaces
+### Benefits of Using Interfaces
 - Established interfaces are self-documenting and promote reusability
 - Interfaces stabilize the way in which different classes communicate
 - Testing and debugging become much easier because explicit errors with useful messages are given if an object does not have the expected type or does not implement the required methods
 
-#### Drawbacks of Using Interfaces
+### Drawbacks of Using Interfaces
 - Interfaces can partially enforce typing, reducing the flexibility of the language
 - JavaScript does not come with inbuilt support for interfaces, so you are emulating Interface behaviour.
 - You will take a small performance hit, due to the extra method invocation
@@ -97,3 +97,9 @@ Each Class can implement more than one interface
 Errors are thrown if a method from an interface is not implemented; either at run-time or compile-time depending on the language.
 
 JavaScript lacks the `interface` and `implements` keywords, as well as run-time checking for compliance. It is possible to emulate most of these features with a helper class and explicit compliance checking.
+
+## Emulating an Interface in JavaScript
+
+### Describing Interfaces with Comments
+
+
