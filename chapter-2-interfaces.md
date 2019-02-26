@@ -191,10 +191,10 @@ function implements(object) {
       }
     }
     if(!interfaceFound) {
-      return false; //An interface was not found
+      return false; // An interface was not found
     }
   }
-  return true; //All interfaces were found
+  return true; // All interfaces were found
 }
 ```
 
@@ -208,4 +208,36 @@ function implements(object) {
 - easy to create a class that declares it implements an interface and then forget to add a method; checks will pass but the method will not be there, potentially causing problems in your code.
 - It added work to explicitly declare the interfaces a class supports.
 
+### Emulating Interfaces with Ducktyping
+"If it walks like a duck, and quacks like a duck, it's a duck"
+
+Premise: if an object contains methods that are named the same as the methods defined in your interface, it implements that interface.
+
+```js
+// Interfaces
+
+var Composite = new Interface('Composite', ['add', 'remove', 'getChild']);
+
+var FormItem = new Interface('FormItem', ['save']);
+
+// CompositeForm Class
+
+var CompositeFrom = function(id, method, action) {
+  // ...
+}
+
+// ...
+
+function addForm(formInstance) {
+  ensuresImplements(formInstance, Composite, FormItem) {
+    // This function will throw an error if a required method is not implemented
+    // ...
+  }
+}
+```
+
+#### Drawbacks:
+- a class never declares which interface it implements, reducing reusability and not self-documenting like other approaches
+- it requires a helper class, `Interface`, and a helper function, `ensuresImplements`.
+- it only check that the method has the correct name, not the names or numbers of arguments used in the methods or their types.
 
