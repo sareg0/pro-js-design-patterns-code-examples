@@ -241,3 +241,35 @@ function addForm(formInstance) {
 - it requires a helper class, `Interface`, and a helper function, `ensuresImplements`.
 - it only check that the method has the correct name, not the names or numbers of arguments used in the methods or their types.
 
+
+### The Interface Implemenation for this Book
+This book uses a combination of the previous approaches
+
+1. Comments to declare what interface a class supports (improving reusability and documentation)
+2. The `Interface` helper
+3. The class method `Interface.ensuresImplements` to perform explicit checking of methods
+4. Useful error messages when objects don't pass the check.
+
+Example:
+
+```js
+// Interfaces
+var Composite = new Interface('Composite', ['add', 'remove', 'getChild']);
+
+var FormItem = new Interface('FormItem', ['save']);
+
+// CompositeForm class
+var CompositeForm = function(id, method, action) {
+  // implements Composite, FormItem
+  // ...
+};
+
+// ...
+
+function addForm(formInstance) {
+  Interface.ensuresImplements(formInstance, Composite, FormItem );
+  // This function will throw an error if a required method is not implemented, halting execution of the function. All code beneath this line will be executed only if the checks pass.
+  // ...
+}
+
+```
