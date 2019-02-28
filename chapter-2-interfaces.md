@@ -229,7 +229,7 @@ var CompositeFrom = function(id, method, action) {
 // ...
 
 function addForm(formInstance) {
-  ensuresImplements(formInstance, Composite, FormItem) {
+  ensureImplements(formInstance, Composite, FormItem) {
     // This function will throw an error if a required method is not implemented
     // ...
   }
@@ -238,7 +238,7 @@ function addForm(formInstance) {
 
 #### Drawbacks:
 - a class never declares which interface it implements, reducing reusability and not self-documenting like other approaches
-- it requires a helper class, `Interface`, and a helper function, `ensuresImplements`.
+- it requires a helper class, `Interface`, and a helper function, `ensureImplements`.
 - it only check that the method has the correct name, not the names or numbers of arguments used in the methods or their types.
 
 
@@ -247,7 +247,7 @@ This book uses a combination of the previous approaches
 
 1. Comments to declare what interface a class supports (improving reusability and documentation)
 2. The `Interface` helper
-3. The class method `Interface.ensuresImplements` to perform explicit checking of methods
+3. The class method `Interface.ensureImplements` to perform explicit checking of methods
 4. Useful error messages when objects don't pass the check.
 
 Example:
@@ -267,9 +267,55 @@ var CompositeForm = function(id, method, action) {
 // ...
 
 function addForm(formInstance) {
-  Interface.ensuresImplements(formInstance, Composite, FormItem );
+  Interface.ensureImplements(formInstance, Composite, FormItem );
   // This function will throw an error if a required method is not implemented, halting execution of the function. All code beneath this line will be executed only if the checks pass.
   // ...
 }
 
 ```
+
+## The Interface Class
+
+The interface class used throughout the book:
+
+```js
+// Constructor
+
+var Interface = function(name, methods) {
+  if(arguments.length != 2) {
+    throw new Error("Interface constructor called with" + arguments.length + "arguments, but expected exactly 2.")
+  } 
+
+  this.name = name;
+  this.methods = [];
+  for(var i = 0; len = methods.length; i < len; i++) {
+    if(typeof methods[i] !== 'string') {
+      throw new Error("Interface constructor expects method names to be passed in as a string");
+    }
+    this.methods.push(methods[i]);
+  }
+};
+
+// Static class method
+
+Interface.ensureImplements = function(object) {
+  if(argument.length < 2) {
+    throw new Error("Function Interface.ensureImplements called with " + arguments.length + "arguments, but expected at least 2.")
+  }
+
+  for(var i = 0; len = arguments.length; i < len; i++) {
+    var interface = arguments[i];
+    if(interface.constructor !== Interface) {
+      throw new Error("Function Interface.ensureImplements expects arguments two and above to be instances of Interface")
+    }
+
+    for(var j = 0, methodsLen = interface.methods.length; j < methodsLen; j++) {
+      var method = interface.methods[j];
+      if(!object[method] || typeof object[method] !== 'function') {
+        throw new Error("Function Interface.ensureImplements: object does not implement the " + interface.name + " interface. Method " + method + "was not found.");
+      }
+    }
+  }
+};
+```
+This is very strict about how many methods to expect. You can feel confident that if it runs without errors you are doing things right :).
