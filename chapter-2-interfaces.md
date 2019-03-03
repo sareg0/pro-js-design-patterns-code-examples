@@ -417,3 +417,24 @@ ResultFormatter.prototype.renderResults = function() {
 
 You could now use an instance of any other class that implements the needed methods.
 You have made the check more accurate (by ensuring the required methods are implement) and more permissive (by allowing any object to be use that matches the interface).
+
+## Patterns that Rely on the Interface
+
+- the factory pattern
+  - to ensure objects created can be used interchangeably, interfaces are used - guaranteeing the object produced will implement the needed methods.
+- the composite pattern
+  - You can't really use this pattern without an interface.
+  - groups of objects can be treated the same as the constituent objects; accomplished by implementing the same interface.
+- the decorator pattern
+  - This patterns works by transparently wrapping another object, accomplished by implementing the exact same interface as the other object.
+  - The `Interface` class is used to ensure decorator objects implement the needed methods
+- the command pattern
+  - all command objects implement the same methods. 
+  - using interfaces, you can create classes that execute these command without knowing anything about them, other than that they use the correct interface.
+  - allows you to create extremely modular and loosely coupled user interfaces and APIs
+
+
+## Summary
+We are able to emulate the 'Interface' features of other languages with a combination of documentation (in comments), a helper class, and duck typing. The challenge is in knowing when to use this helper class. Enforcing strict type checking, where not needed, reduces the flexibility of JavaScript. However, careful use of the `Interface` class can create more robust classes and more stable code.
+
+
