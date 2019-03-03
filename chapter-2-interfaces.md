@@ -325,7 +325,7 @@ This is very strict about how many methods to expect. You can feel confident tha
 Interfaces improve JavaScript's flexibility by allowing objects to be more loosely coupled. 
 
 Below is an example of creating an `Interface` object for an API you rely on and testing each object you receive to ensure it implements those interfaces correctly:
- 
+
 ```js
 var DynamicMap = new Interface('DynamicMap', ['centerOnPoint', 'zoom', 'draw']);
 
@@ -336,3 +336,84 @@ function displayRoute(mapInstance) {
   mapInstance.draw();
 }
 ```
+
+### How to Use the Interface Class
+
+It is up to you to decide when interfaces should be used in your code.
+
+Assuming you have decide that they are worth it for the project in question, here is how to use them:
+
+1. Include the `Interface` class in your HTML file
+2. Go through the methods in your code that take objects as arguments. Determine what methods these object arguments are required to have in order for your code to work.
+3. Create `Interface` objects for each discreet set of methods you require.
+4. Remove all explicit constructor checking. Since we are using duck typing. The type of the object no longer matters.
+5. Replace constructor checking with `Interface.ensureImplements`
+
+Your code is now more loosely coupled because you aren't relying on instances of any particular class 
+
+### Example: Using the Interface Class
+
+Imagine you have created a class to take some automated test results and format them for viewing on a web page. The class' constructor takes an instance of the `TestResult` class as an argument. It then formats the data encapsulated in the `TestResult` object and outputs it on request.
+
+```js
+// ResultFormatter class, before we implement interface checking
+var ResultFormatter = function(resultsObject) {
+  if(!(resultsObject instanceOf TestResult)) {
+    throw new Error("ResultFormatter: constructor requires an instance of TestResult as an argument.")
+  }
+  this.resultsObject = resultsObject;
+};
+
+ResultFormatter.prototype.renderResults = function() {
+  var dateOfTest = this.resultsObject.getDate();
+  var resultsArray = this.resultsObject.getResults();
+
+  var resultsContainer = document.createElement('div');
+
+  var resultsHeader = document.createElement('h3');
+  resultsHeader.innerHTML = 'Test Results from' + dateOfTest.toUTCString();
+  resultsContainer.appendChild(resultsHeader);
+
+  var resultsList = document.createElement('ul');
+  resultsContainer.appendChild(resultsList);
+
+  for(var i = 0, len = resultsArray.length; i < len; i++) {
+    var listItem = document.createElement('li')
+    listItem.innerHTML = resultsArray[i];
+    resultsList.appendChild(listItem);
+  }
+
+  return resultsContainer;
+};
+```
+
+The above example only checks that the `resultsObject` is an instance of `TestResult`; it does not ensure that the methods you need are implemented. `TestResult` could be changed so that it no longer has a `getDate` method, meaning he constructor would pass but the `renderResults` methods would fail.
+
+Another limiting factor of using a constructor check is that it prevents instances of other classes from being used as arguments, even if they would work fine.
+
+The solution is to replace the `instanceOf` check with an interface.
+
+First, create the interface itself:
+
+```js
+// ResultSet Interface
+var ResultSet = new Interface('ResultSet', ['getDate', 'getResults']);
+```
+
+Now that you have an interface, you can replace the `instanceOf` check with an interface check:
+
+```js
+// ResultFormatter class, after adding Interface checking
+
+var ResultFormatter = function(resultsObject) {
+  Interface.ensureImplements(resultsObject, ResultSet);
+  this.resultsObject = resultsObject;
+};
+
+ResultFormatter.prototype.renderResults = function() {
+  // ...
+};
+```
+
+You could now use an instance of any other class that implements the needed methods.
+You have made the check more accurate (by ensuring the required methods are implement) and more permissive (by allowing any object to be use that matches the interface).
