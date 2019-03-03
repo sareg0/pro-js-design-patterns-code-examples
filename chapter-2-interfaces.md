@@ -319,3 +319,20 @@ Interface.ensureImplements = function(object) {
 };
 ```
 This is very strict about how many methods to expect. You can feel confident that if it runs without errors you are doing things right :).
+
+### When to Use the Interface Class
+
+Interfaces improve JavaScript's flexibility by allowing objects to be more loosely coupled. 
+
+Below is an example of creating an `Interface` object for an API you rely on and testing each object you receive to ensure it implements those interfaces correctly:
+ 
+```js
+var DynamicMap = new Interface('DynamicMap', ['centerOnPoint', 'zoom', 'draw']);
+
+function displayRoute(mapInstance) {
+  Interface.ensureImplements(mapInstance, DynamicMap);
+  mapInstance.centerOnPoint(12, 34);
+  mapInstance.zoom(5);
+  mapInstance.draw();
+}
+```
