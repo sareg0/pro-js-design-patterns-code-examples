@@ -164,3 +164,71 @@ Book.prototype = {
 
 #### Drawbacks of this approach:
 - the attributes are still public, and can still be set directly
+
+### Private Members Through Closures
+```js
+var Book = function(newIsbn, newTitle, newAuthor) { // Implements publication
+
+  // Private attributes.
+  var isbn, title, author;
+
+  // Private method.
+  function checkIsbn(isbn) {
+    // ...
+  }
+
+  // Privileged methods.
+  this.getIsbn = function() {
+    return isbn;
+  };
+  
+  this.setIsbn = function(newIsbn) {
+    if(!checkIsbn(newIsbn)) throw new Error('Book: Invalid ISBN.');
+    isbn = newIsbn;
+  };
+
+  this.getTitle = function() {
+    return title;
+  };
+
+  this.setTitle = function(newTitle) {
+    title = newTitle || 'No title specified';
+  };
+
+  this.getAuthor = function() {
+    return author;
+  };
+
+  this.setAuthor = function(newAuthor) {
+    author = newAuthor || 'No author specified';
+  };
+
+  // Contribute code.
+  this.setIsbn(newIsbn);
+  this.setTitle(newTitle);
+  this.setAuthor(newAuthor);
+};
+
+// Public, non-privileged methods.
+Book.prototype = {
+  display: function() {
+    // ...
+  }
+};
+```
+
+In the previous example, attributes were referred to use the `this` keyword, but here they are declared using `var`; meaning they only exist in the `Book` constructor.
+the `checkIsbn` method is created in the same way, making it a private method.
+
+The _privileged_ methods are publicly accessible, but they have access to the private attributes because they are declared with the `Book` constructor's scope.
+
+Public methods that do not need access to the private attributes can be declared in the `Book.prototype`.
+
+
+Only make a method privileged if it needs direct access to private attributes. Having too many privileged methods can also cause memory problems.
+
+With this pattern it is impossible for a programmer to get direct access to any of the data of a `Book` instance; they are forced to go through setter or mutator methods.
+
+### Drawbacks
+- every new instance also copies the private and privileged methods; in the 'fully exposed object' pattern there is only one copy of each in memory.
+- this pattern is hard to subclass; the new inherited class does not have access to the super class' private attributes or methods.
