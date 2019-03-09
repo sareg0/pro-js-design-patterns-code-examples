@@ -216,6 +216,49 @@ This naming convention can be applied to methods also.
 - needs to be fully agreed upon by the programmers working on a project to be of any use.
 - not a real protection for private attributes.
 
+### Scope, Nested Functions, and Closures
+Scope helps us make attributes inaccessible to the outside, except via a function.
+
+
+```js
+function foo() {
+  var a = 10;
+
+  function bar() {
+    a *= 2;
+  }
+
+  bar();
+  return a;
+}
+```
+
+The variable `a` is accessible to the function `bar` because `bar` is declared in the same scope as `a` (inside `foo`).
+
+
+```js
+function foo() {
+  var a = 10;
+
+  function bar() {
+    a *= 2;
+    return a;
+  }
+
+  return bar;
+}
+
+var baz = foo(); // `baz` is now a reference to function `bar`
+baz(); // returns 20;
+baz(); // returns 40;
+baz(); // returns 80;
+
+var blat = foo(); // `blat` is another reference to `bar`;
+blat(); // returns 20, because a new copy of `a` is being used;
+```
+
+This is an example of a closure. The most common way of creating a closure is returning a nested function.
+
 ### Private Members Through Closures
 ```js
 var Book = function(newIsbn, newTitle, newAuthor) { // Implements publication
