@@ -404,3 +404,59 @@ A rule of thumb for deciding whether a private method should be static is to see
 
 Note:
 Everything in JavaScript is an object. An object is essentially a hash table, so you can add members at any time.
+
+
+### Constants
+You can emulate constants in JavaScript by creating a private variable with an accessor but no mutator. Because consants are created at development time, and don't change with every new instance, it makes sense to create them as private static attributes. Here is how call a constant from the `UPPER_BOUND` from `Class`:
+
+```js
+Class.getUPPER_BOUND();
+```
+
+To implement this accessor, you would need a privileged static method, which we haven't covered yet. It is just like creating a privileged instance method, with the `this` keyword:
+
+```js
+var Class = (function() {
+  // Constants (created as a private static attributes).
+  var UPPER_BOUND = 100;
+
+  // Privileged static method.
+  this.getUPPER_BOUND() {
+    return UPPER_BOUND;
+  }
+
+  // ...
+
+  // Return the constructor
+  return function(constructorArgument) {
+    // ...
+  }
+})();
+```
+
+If you have a lot of constants, you can create a generic accessor (instead of one for each).
+
+```js
+var Class = (function() {
+  // Private static attributes.
+  var constants = {
+    UPPER_BOUND: 100,
+    LOWER_BOUND: -100
+  }
+
+  // ...
+
+  // Return the constructor
+  return function(constructorArgument) {
+    // ...
+  }
+})();
+```
+
+You then call the single accessor:
+
+```js
+Class.getConstant('UPPER_BOUND');
+```
+
+### Singletons and Object Factories
