@@ -405,7 +405,6 @@ A rule of thumb for deciding whether a private method should be static is to see
 Note:
 Everything in JavaScript is an object. An object is essentially a hash table, so you can add members at any time.
 
-
 ### Constants
 You can emulate constants in JavaScript by creating a private variable with an accessor but no mutator. Because consants are created at development time, and don't change with every new instance, it makes sense to create them as private static attributes. Here is how call a constant from the `UPPER_BOUND` from `Class`:
 
@@ -460,3 +459,24 @@ Class.getConstant('UPPER_BOUND');
 ```
 
 ### Singletons and Object Factories
+The singleton pattern uses a returned object literal to expose privileged members, while keeping private members protected in the enclosing scope. It uses the same technique as in earlier sections, where an outer function is executed immediately and the result is assigned to a variable. Discussed further in Chapter 5.
+
+An object factory is the same as a class constructor. Discussed further in Chapter 7.
+
+## Benefits of Using Encapsulation
+- protects the integrity of the internal data
+- easier refactoring of your objects.
+- private variables stops you from having to worry about namespace collisions
+- only making methods public that are specified in the interface, you are promoting loosely coupled objects.
+
+## Drawbacks of Encapsulation
+- hard to unit test private methods; only test public methods.
+- may make your classes too inflexible, if you don't have a clear understanding of how programmers will use them.
+- it is hard to implement in JavaScript; it is important other programmers understand the pattern being used.
+
+## Summary
+- JavaScript has no built in way to enforce encapsulation; you rely on other techniques to achieve this.
+- Creating true private members is only possible through closures.
+- Creating a protected variable spaces allows you to implement public, private, and privileged members, as well as static class members and constants.
+
+TODO: go over these patterns again and make sure you understand
