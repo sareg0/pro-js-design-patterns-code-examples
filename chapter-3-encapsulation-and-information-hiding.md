@@ -330,3 +330,77 @@ With this pattern it is impossible for a programmer to get direct access to any 
 ## More Advanced Patterns
 
 ### Static Methods and Attributes
+Static members iteract with the class itself, whereas most methods and attributes interact with an instance of a class.
+
+Here is the `Book` class with static attributes and methods:
+
+```js
+var Book = (function() {
+  // Private static attributes.
+  var numOfBooks = 0;
+
+  // Private static method.
+  function checkIsbn(isbn) {
+    // ...
+  }
+  
+  // Return the constructor
+  return function(newIsbn, newTitle, newAuthor) { // Implements Publication
+    
+    // Private attributes.
+    var isbn, title, author
+
+    // Privileged methods.
+    this.getIsbn = function () {
+      return isbn;
+    };
+    this.setIsbn = function (newIsbn) {
+      if(!checkIsbn(newIsbn)) throw new Error('Book: Invalid ISBN.')
+      isbn = newIsbn;
+    };
+
+    this.getTitle = function() {
+      return title;
+    };
+    this.setTitle = function(newTitle) {
+      title = newTitle || 'No title specified';
+    };
+
+    this.getAuthor = function() {
+      return author;
+    };
+    this.setAuthor = function(newAuthor) {
+      author = newAuthor || 'No author specified';
+    };
+
+    // Constructor code.
+    numOfBooks++; // Keep track of how many Books have been instantiated with the private static attribute.
+
+    if(numOfBooks > 50) throw new Error('Book: Only 50 instances of Book can be created');
+
+    this.setIsbn(newIsbn);
+    this.setTitle(newTitle);
+    this.setAuthor(newAuthor);
+  }
+})();
+
+// Public static method
+Book.convertToTitleCase = function(inputString) {
+  // ...
+};
+
+// Public, non-privileged methods.
+Book.prototype = {
+  display: function() {
+    // ...
+  }
+};
+```
+Because the private static methods are declared outside the constructor, they do not have access to the private attributes and are, therefore, not privileged. Private methods can call private static methods, but not the other way around.
+
+A rule of thumb for deciding whether a private method should be static is to see whether it needs to access any of the instance data. It it does not need access, making the method static is more efficient (in terms of memory use) because only one copy is ever created.
+
+`convertToTitleCase` is a public static method; it essentially uses the constructor as a name space. Public static methods could just as easily be separate functions, but it is useful to bundle tasks related to a class together, that are not related to any particular instance... Since they don't depend on any data from the instances.
+
+Note:
+Everything in JavaScript is an object. An object is essentially a hash table, so you can add members at any time.
