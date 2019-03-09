@@ -165,6 +165,57 @@ Book.prototype = {
 #### Drawbacks of this approach:
 - the attributes are still public, and can still be set directly
 
+
+### Private Methods Using a Naming Convention
+```js
+var Book = function(isbn, title, author) { // implements Publication
+  this.setIsbn(isbn);
+  this.setTitle(title);
+  this.setAuthor(author)
+}
+
+Book.prototype = {
+  checkIsbn: function() {
+    // ...
+  },
+  getIsbn: function() {
+    return this._isbn
+  },
+  setIsbn: function(isbn) {
+    if(!this.checkIsbn(isbn)) throw new Error('Book: Invalid ISBN.');
+    this._isbn = isbn;
+  },
+
+  getTitle: function() {
+    return this._title;
+  },
+  setTitle: function(title) {
+    this._title = title || 'No title specified';
+  },
+
+  getAuthor: function() {
+    return this._author;
+  },
+  setAuthor: function() {
+    this._author = author || 'No author specified';
+  },
+
+  display: function() {
+    // ...
+  }
+};
+```
+This underscores at the beginning of each attributes indicates it is intended to be private.
+This naming convention can be applied to methods also.
+
+#### Benefits
+- using an underscore is a well known naming convention
+- all the benefits of the 'fully exposed object' pattern
+
+#### Drawbacks
+- needs to be fully agreed upon by the programmers working on a project to be of any use.
+- not a real protection for private attributes.
+
 ### Private Members Through Closures
 ```js
 var Book = function(newIsbn, newTitle, newAuthor) { // Implements publication
@@ -232,3 +283,7 @@ With this pattern it is impossible for a programmer to get direct access to any 
 ### Drawbacks
 - every new instance also copies the private and privileged methods; in the 'fully exposed object' pattern there is only one copy of each in memory.
 - this pattern is hard to subclass; the new inherited class does not have access to the super class' private attributes or methods.
+
+## More Advanced Patterns
+
+### Static Methods and Attributes
