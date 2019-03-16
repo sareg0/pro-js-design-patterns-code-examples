@@ -172,3 +172,71 @@ Author.prototype.getName = function() {
   return name + ', Author of ' + this.getBooks().join(', ');
 }
 ```
+## Prototypal Inheritance
+To learn prototypcal inheritance it is best to think only in terms of objects.
+
+The classical approach to creating an object is:
+
+  - a) define the structure of the object, using a class declaration
+
+  - b) instantiate that class to create a new object. 
+
+Objects created in this manner:
+- have their own copies of all instance attributes
+- a link to a single the single copy of each of the instance methods.
+
+In prototypal inheritance you simply create an object. This object is then reused by new objects and is called the _**prototype object**_ (written in italics to not be confused with the `prototype` object), because it provides a prototype for what the other objects should look like.
+
+`Person`/`Author` using prototypal inhritance:
+
+```js
+/* Person Prototype Object */
+var Person = {
+  name: 'default name',
+  getName: function() {
+    return this.name;
+  }
+};
+```
+
+`Person` is now an object literal, and the _**prototype object**_ for other `Person`-like objects that you want to create. 
+
+Methods of the prototype will most likely never change, but the attributes almost certainly will be:
+
+```js
+var reader = clone(Person);
+alert(reader.getName()); // Output: 'default name'.
+reader.name = 'John Smith';
+alert(reader.getName()); // Output: 'John Smith'.
+```
+
+`clone` provides an empty object with the `prototype` attribute set to the _**prototype object**_. This means that if an attribute or method look up on the 'reader' object fails, it will look to the _**prototype object**_.
+
+To create an `Author`, you make a clone of `Person`, instead of a subclass:
+
+```js
+/* Author Prototype Object */
+var Author = clone(Person);
+Author.books = []; // Default value.
+Author.getBooks = function() {
+  return this.books;
+}
+```
+
+The methods and attributes of this clone of `Person` can now be overridden. You can change the default values give by `Person`, or add attributes and methods. This creates a new _**prototype object**_, which you can then clone to create `Author`-like objects:
+
+```js
+var author = [];
+
+author[0] = clone(Author);
+author[0].name = 'Dustin Diaz';
+author[0].books = ['JavaScript Design Patterns'];
+
+author[1] = clone(Author);
+author[1].name = 'Ross Harmes';
+author[1].books = ['JavaScript Design Patterns'];
+
+author[1].getName();
+author[1].getBooks();
+```
+
