@@ -240,3 +240,89 @@ author[1].getName();
 author[1].getBooks();
 ```
 
+
+### Asymmetrical Reading and Writing of Inherited Members
+A clone is not a fully independent copy of its _**prototype object**_; it's a new empty object with its `prototype` attribute set to the _**prototype object**_.
+
+`author[1].name` is actually a link back to the primitive `Person.name`. When you read the value `author[1].name` you are getting the linked value from the `prototype`, if you haven't defined the `name` attribute directly on the `author[1]` instance yet.  When you write to `author[1].name`, you are defining a new attribute directly on the `author[1]` object.
+
+```js
+var authorClone = clone(Author);
+alert(authorClone.name) // Linked to the primative `Person.name`. Output: 'default name'.
+authorClone.name = 'Becky Chambers' // A new primative is created and added to the authorClone itself.
+alert(authorClone.name) // Now linked to the primative authorClone.name. Output: 'Ada Lovelace'.
+authorClone.books.push('The Long Way to a Small Angry Planet')
+// authorClone.books is linked to Author.books. 
+// The above modifies the prototype object's default value, and all other objects that inherit from `Author` will now have a new default value.
+authorClone.books = []; // A new array is created and added to the authorClone object itself.
+authorClone.book.push('A Closed and Common Orbit') // modifying that new array
+```
+
+One must create new copies of all arrays and objects before changing their members. It is easy to forget this and modify the value of the _**prototype object**_, but one must avoid this at all costs. 
+
+You can use the `hasOwnProperty` method to help distinguish between inherited members and the object's actual members.
+
+Sometimes _**prototype objects**_ have child objects within them. To alter a single value within a child object, you have to recreate the entire thing. This would mean recreating it, and the cloned object would need to know about the structure and defaults for each child. In order to keep all objects as loosely coupled as possible. any complex child objects should be created using methods:
+
+```js
+var CompoundObject = {
+  string1: 'default value',
+  childObject: {
+    bool: true,
+    num: 10
+  }
+}
+
+var compoundObjectClone = clone(CompoundObject);
+
+// Bad! Changes the value of CompoundObject.childObject.num
+compoundObjectClone.childObject.num = 5;
+
+// Better. Creates a new object, but compoundObject must know the structure of that object, and the defaults.
+// This makes CompoundObject and compoundObjectClone tightly coupled.
+
+compoundObjectClone.childObject = {
+  bool: true,
+  num: 5
+};
+
+// Best approach. 
+// Uses a method to create a new object, with the same structure and defaults as the original.
+
+var CompoundObject = {};
+CompoundObject.string1 = 'default value';
+CompoundObject.createChildObject = function() {
+  return {
+    bool: true,
+    num: 10
+  }
+};
+
+CompoundObject.childObject = CompoundObject.createChildObject();
+
+var compoundObjectClone = clone(CompoundObject)
+compoundObjectClone.childObject = CompoundObject.createChildObject();
+compoundObjectClone.childObject.num = 5;
+```
+
+
+### The `clone` Function
+...
+## Comparing Classical and Prototypal Inheritance
+...
+## Inheritance and Encapsulation
+...
+## Mixin Classes
+...
+## Example: Edit-in-Place
+...
+### Using Classical Inheritance
+...
+### Using Prototypal Inheritance
+...
+### Using Mixin Classes
+...
+## When Should Inheritance Be Used?
+...
+## Summary
+...
