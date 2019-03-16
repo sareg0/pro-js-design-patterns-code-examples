@@ -307,7 +307,17 @@ compoundObjectClone.childObject.num = 5;
 
 
 ### The `clone` Function
-...
+```js
+/* Clone Function  */
+function clone(object) {
+  function F() {};
+  F.prototype = object;
+  return new F;
+}
+```
+
+The cloned object is completely empty, except for the `prototype` attribute, which is (indirectly) pointing to the _**prototype object**_.
+
 ## Comparing Classical and Prototypal Inheritance
 ...
 ## Inheritance and Encapsulation
