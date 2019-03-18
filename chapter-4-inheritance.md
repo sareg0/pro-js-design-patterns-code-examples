@@ -319,11 +319,87 @@ function clone(object) {
 The cloned object is completely empty, except for the `prototype` attribute, which is (indirectly) pointing to the _**prototype object**_.
 
 ## Comparing Classical and Prototypal Inheritance
-...
+Classical Inheritance is..
+- more common, throughout other programming languages
+- 
+
+Prototypal Inheritance is...
+- memory efficient.
+- unique to JavaScript
+
 ## Inheritance and Encapsulation
-...
+Fully exposed classes are the best candidates for subclassing; all members are public and will be passed on to the subclass. You can shield some methods using the underscore convention.
+
+If a class with true private members is subclassed, priviledged methods will be passed on because they are publicly accessible. Private members can only be accessed via these privileged methods; new ones cannot be added to the subclass.
+
 ## Mixin Classes
-...
+Mixins classes are general classes that exist only to pass on their general methods to other classes.
+
+```js
+var Mixin = function() {
+  Mixin.prototype = {
+    serialize: function() {
+      var output = [];
+      for(key in this) {
+        output.push(key + ': ' + this[key]);
+      }
+      return output.join(', ');
+    }
+  }
+};
+```
+This sort of method could be useful to other classes, but you don't want them all inheriting from `Mixin`.
+
+```js
+augment(Author, Mixin);
+
+var author = new Author('Ross Harmes', ['JavaScript Design Patterns']);
+var serializedString = author.serialize(); 
+```
+
+In JavaScript the `prototype` attribute can only point to one object, meaning there can only be single inheritance. However, because a class _can_ be augmented by more than one mixin, this effectively is a way of achieving multiple inheritance.
+
+The Augment function works like so:
+1. walk through each member of the giving class's `prototype`, and add them to the receiving classes `prototype`.
+2. If the member exists, skip it.
+
+```js
+/* Augment function */
+
+function Augment(receivingClass, givingClass) {
+  for(methodName in givingClass.prototype) {
+    if(!receivingClass.prototype[method_name]) {
+      receivingClass.prototype[method_name] = givingClass.prototype[method_name]
+    }
+  }
+}
+```
+
+An improved version, only copies methods with names matching the argument passed in:
+
+```js
+/* Augment function improved */
+
+function Augment(receivingClass, givingClass) {
+  if(arguments[2]) { //Only given certain methods.
+    for(var i =  02, len = arguments.length; i < len; i++) {
+      receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]]
+    }
+  } else {
+    for(methodName in givingClass.prototype) {
+      if(!receivingClass.prototype[method_name]) {
+        receivingClass.prototype[method_name] = givingClass.prototype[method_name]
+      }
+    }
+  }
+}
+```
+You can now write `augment(Author, Mixin, serialize)` to only augment `Author` with the `serialize` method.
+
+Mixins are a lightweight way to avoid duplication, but they are not so oft-used.
+
+
+
 ## Example: Edit-in-Place
 ...
 ### Using Classical Inheritance
