@@ -46,7 +46,7 @@ Author.prototype.getBooks = function() { // Add a method to Author.
 ```
 
 
-Although JavaScript has no `extends` keyword, every object has an attribute called `prototype`, which either points to another object or to `null`. When a member of an object is accessed (e.g. reader.getName) JavaScript looks for this member in the `prototype` object, if it doesn't exist in the current object. If it is not found, it continues up the chain, accessing each object's `prototype` until the member is found (or until the prototype is `null`). 
+Although JavaScript has no `extends` keyword, every object has an attribute called `prototype`, which either points to another object or to `null`. When a member of an object is accessed (e.g. reader.getName) JavaScript looks for this member in the `prototype` object, if it doesn't exist in the current object. If it is not found, it continues up the chain, accessing each object's `prototype` until the member is found (or until the prototype is `null`).
 
 In order to make one class inherit from another, you need to set the subclasses prototype (`Author.prototype`) to
 point to an instance of the superclass (`Person`).
@@ -103,9 +103,9 @@ function extend(subClass, superClass) {
 
 This function does the same things as in the previous inheritance pattern, in that it sets the `prototype`, then resets to the correct constrcutor (`subClass`);
 
-In contrast to the previous pattern, this function adds the empty class `F` into the prototype chain in order to prevent a new (and possibly large) instance of the superclass from having to be insantiated. 
+In contrast to the previous pattern, this function adds the empty class `F` into the prototype chain in order to prevent a new (and possibly large) instance of the superclass from having to be insantiated.
 
-Since the object that gets instantiated is a throw away, you don't want to create it unecessarily, particularly if its constructor has side effects or is computationally expensive. 
+Since the object that gets instantiated is a throw away, you don't want to create it unecessarily, particularly if its constructor has side effects or is computationally expensive.
 
 The previous `Person`/`Author` example now looks like this:
 
@@ -113,7 +113,7 @@ The previous `Person`/`Author` example now looks like this:
 /* Class Person. */
 function Person(name) {
   this.name = name;
-} 
+}
 
 Person.prototype.getName = function() {
   return this.name;
@@ -179,7 +179,7 @@ The classical approach to creating an object is:
 
   - a) define the structure of the object, using a class declaration
 
-  - b) instantiate that class to create a new object. 
+  - b) instantiate that class to create a new object.
 
 Objects created in this manner:
 - have their own copies of all instance attributes
@@ -199,7 +199,7 @@ var Person = {
 };
 ```
 
-`Person` is now an object literal, and the _**prototype object**_ for other `Person`-like objects that you want to create. 
+`Person` is now an object literal, and the _**prototype object**_ for other `Person`-like objects that you want to create.
 
 Methods of the prototype will most likely never change, but the attributes almost certainly will be:
 
@@ -252,13 +252,13 @@ alert(authorClone.name) // Linked to the primative `Person.name`. Output: 'defau
 authorClone.name = 'Becky Chambers' // A new primative is created and added to the authorClone itself.
 alert(authorClone.name) // Now linked to the primative authorClone.name. Output: 'Ada Lovelace'.
 authorClone.books.push('The Long Way to a Small Angry Planet')
-// authorClone.books is linked to Author.books. 
+// authorClone.books is linked to Author.books.
 // The above modifies the prototype object's default value, and all other objects that inherit from `Author` will now have a new default value.
 authorClone.books = []; // A new array is created and added to the authorClone object itself.
 authorClone.book.push('A Closed and Common Orbit') // modifying that new array
 ```
 
-One must create new copies of all arrays and objects before changing their members. It is easy to forget this and modify the value of the _**prototype object**_, but one must avoid this at all costs. 
+One must create new copies of all arrays and objects before changing their members. It is easy to forget this and modify the value of the _**prototype object**_, but one must avoid this at all costs.
 
 You can use the `hasOwnProperty` method to help distinguish between inherited members and the object's actual members.
 
@@ -286,7 +286,7 @@ compoundObjectClone.childObject = {
   num: 5
 };
 
-// Best approach. 
+// Best approach.
 // Uses a method to create a new object, with the same structure and defaults as the original.
 
 var CompoundObject = {};
@@ -321,7 +321,7 @@ The cloned object is completely empty, except for the `prototype` attribute, whi
 ## Comparing Classical and Prototypal Inheritance
 Classical Inheritance is..
 - more common, throughout other programming languages
-- 
+-
 
 Prototypal Inheritance is...
 - memory efficient.
@@ -354,7 +354,7 @@ This sort of method could be useful to other classes, but you don't want them al
 augment(Author, Mixin);
 
 var author = new Author('Ross Harmes', ['JavaScript Design Patterns']);
-var serializedString = author.serialize(); 
+var serializedString = author.serialize();
 ```
 
 In JavaScript the `prototype` attribute can only point to one object, meaning there can only be single inheritance. However, because a class _can_ be augmented by more than one mixin, this effectively is a way of achieving multiple inheritance.
@@ -401,9 +401,156 @@ Mixins are a lightweight way to avoid duplication, but they are not so oft-used.
 
 
 ## Example: Edit-in-Place
-...
+The task: write a modular, reusable API for creating and managing edit-in-place fields (a normal block of text in a webpage that, when clicked, turns into a form field and several buttons that allow that block of text to be edited). It should allow you to assign a unique ID to the object, give it a default value, and specify where in the page you want it to go.
+It should also let you access the current value of the field at any time and have a couple of different options for the type of editing field used (e.g. a text area or an input text field).
+
 ### Using Classical Inheritance
-...
+
+First, create an API using classical inheritance:
+
+```js
+/* EditInPlaceField class. */
+function EditInPlaceField(id, parent, value) {
+  this.id = id;
+  this.value = value || 'default value';
+  this.parentElement = parent;
+
+  this.createElements(this.id);
+  this.attachEvents();
+};
+
+EditInPlaceField.prototype = {
+  createElements: function(id) {
+    this.containerElement = document.createElement('div');
+    this.parentElement.appendchild(this.containerElement);
+
+    this.staticElement = document.createElement('span');
+    this.containerElement.appendChild(this.staticElement);
+    this.staticElement.innerHTML = this.value;
+
+    this.fieldElement = document.createElement('input');
+    this.fieldElement.type = 'text';
+    this.fieldElement.value = this.value;
+    this.containerElement.appendChild(this.fieldElement);
+
+    this.saveButton = document.createElement('input');
+    this.saveButton.type = 'button';
+    this.saveButton.value = 'Save';
+    this.containerElement.appendChild(this.saveButton);
+
+    this.cancelButton = document.createElement('input');
+    this.cancelButton.type = 'button';
+    this.cancelButton.value = 'Cancel';
+    this.containerElement.appendChild(this.cancelButton);
+
+    this.convertToText()
+  },
+  attachEvents: function() {
+    var that = this;
+    addEvent(this.staticElement, 'click', function() {
+      that.convertToEditable();
+    });
+    addEvent(this.savebutton, 'click', function() {
+      that.save();
+    });
+    addEvent(this.cancelButton, 'click', function() {
+      that.cancel();
+    });
+  },
+
+  convertToEditable: function() {
+    this.staticElement.style.display = 'none';
+    this.fieldElement.style.display = 'inline';
+    this.savebutton.style.display = 'inline';
+    this.cancelButton.style.display = 'inline';
+
+    this.setValue(this.value);
+  },
+  save: function() {
+    this.value = this.getValue();
+    var that = this;
+    var callback = {
+      success: function() { that.convertToText(); },
+      failure: function() { alert('Error saving value.'); }
+    };
+    ajaxRequest('GET', 'save.php?id=', + this.id + '&value=' + this.value, callback);
+  },
+  cancel: function() {
+    this.convertToText();
+  },
+  convertToText: function() {
+    this.fieldElement.style.display = 'none';
+    this.savebutton.style.display = 'none';
+    this.cancelButton.style.display = 'none';
+    this.staticElement.style.display = 'inline';
+
+    this.setValue(this.value);
+  },
+  setValue: function(value) {
+    this.fieldElement.value = value;
+    this.staticElement.innerHTML = value;
+  },
+  getValue: function() {
+    return this.fieldElement.value;
+  }
+};
+```
+
+To create a field, instantiate the class:
+
+```js
+var titleClassical = new EditInPlaceField('titleClassical', $('doc'), 'Title Here');
+var currentTitleText = titleClassical.getValue();
+```
+
+This creates an instance of `EditInPlaceField` class.
+- text displayed in a `span` tag and a text input field used as the editing area.
+
+It has configuration methods (`createElements`, `attachEvents`), a few internal methods for converting and saving (`convertToEditable`, `save`, `cancel`, `convertToText`), and an accessor and mutator pair (`getValue`, `setValue`).
+
+Next create a class that uses a text area instead of a text input. Because `EditInPlaceField` and `EditInPlaceArea` are almost identical, create one as a subclass of the other, to avoid duplication:
+
+```js
+/* EditInPlaceArea class. */
+function EditInPlaceArea(id, parent, value) {
+  EditInPlaceArea.superclass.constructor.call(this, id, parent, value);
+};
+extend(EditInPlaceArea, EditInPlaceField);
+
+// Override certain methods.
+EditInPlaceArea.prototype.createElements = function(id) {
+  this.containerElement = document.createElement('div');
+  this.parentElement.appendChild(this.containerElement);
+
+  this.staticElement = document.createElement('p');
+  this.containerElement.appendChild(this.staticElement);
+  this.staticElement.innerHTML = this.value;
+
+  this.fieldElement = document.createElement('textarea');
+  this.fieldElement.value = this.value;
+  this.containerElement.appendChild(this.fieldElement);
+
+  this.saveButton = document.createElement('input');
+  this.saveButton.type = 'button';
+  this.saveButton.value = 'Save';
+  this.containerElement.appendChild(this.saveButton);
+
+  this.cancelButton = document.createElement('input');
+  this.cancelButton.type = 'button'
+  this.cancelButton.value = 'Cancel';    this.containerElement.appendChild(this.cancelButton);
+
+  this.convertToText();
+};
+EditInPlaceArea.prototype.convertToText = function() {
+  this.fieldElement.style.display = 'none';
+  this.saveButton.style.display = 'none';
+  this.cancelButton.style.display = 'none';
+  this.staticElement.style.display = 'block';
+
+  this.setValue(this.value);
+};
+```
+
 ### Using Prototypal Inheritance
 ...
 ### Using Mixin Classes
