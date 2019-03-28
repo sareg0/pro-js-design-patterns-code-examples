@@ -366,7 +366,7 @@ The Augment function works like so:
 ```js
 /* Augment function */
 
-function Augment(receivingClass, givingClass) {
+function augment(receivingClass, givingClass) {
   for(methodName in givingClass.prototype) {
     if(!receivingClass.prototype[method_name]) {
       receivingClass.prototype[method_name] = givingClass.prototype[method_name]
@@ -380,7 +380,7 @@ An improved version, only copies methods with names matching the argument passed
 ```js
 /* Augment function improved */
 
-function Augment(receivingClass, givingClass) {
+function augment(receivingClass, givingClass) {
   if(arguments[2]) { //Only given certain methods.
     for(var i =  02, len = arguments.length; i < len; i++) {
       receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]]
@@ -694,9 +694,150 @@ The similarity of the classical and prototypal examples illustrates how easy it 
 
 Prototypal inheritance in this example doesn't really provide anything over classical inheritance. The objects do not use many default values, so you aren't really saving any memory; both paradigms work equally well for this example.
 
-
 ### Using Mixin Classes
-...
+
+We will now create one mixin class with all of the methods we want to share. Then we will create a new class and use augment to share those methods.
+
+```js
+/* Mixin class for the edit-in-place methods. */
+var EditInPlaceMixin = function() {};
+EditInPlaceMixin.prototype = {
+  createElements: function (id) {
+    this.containerElement = document.createElement('div');
+    this.parentElement.appendChild(this.containerElement);
+
+    this.staticElement = document.createElement('span');
+    this.containerElement = appendChild(this.staticElement);
+    this.staticElement.innerHTML = this.value;
+
+    this.fieldElement = document.createElement('span');
+    this.fieldElement.type = 'text';
+    this.fieldElement.value = this.value;
+    this.containerElement.appendChild(this.fieldElement);
+
+    this.saveButton = document.createElement('input');
+    this.saveButton.type = 'button';
+    this.saveButton.value = 'save';
+    this.containerElement.appendchild(this.saveButton);
+
+    this.cancelButton = document.createElement('input');
+    this.cancelButton.type = 'button';
+    this.cancelButton.value = 'Cancel';
+    this.containerElement.appendChild(this.cancelButton);
+
+    this.convertToText();
+  },
+  attachEvents: function() {
+    var that = this;
+    addEvent(this.staticElement, 'click', function() { that.convertToEditable(); })
+    addEvent(this.saveButton, 'click' function() { that.save(); });
+    addEvent(this.cancelButton, 'click', function() { that.cancel(); });
+  },
+  convertToEditable: function() {
+    this.staticElement.style.display = 'none';
+    this.fieldElement.style.display = 'inline';
+    this.saveButton.style.display = 'inline';
+    this.cancelButton.style.display = 'inline';
+
+    this.setValue(this.value);
+  },
+  save: function() {
+    this.value = this.getValue();
+    var that = this;
+    var callback = {
+      success: function() { that.convertToText(); },
+      failure: function() { alert('Error saving value.') }
+    };
+    ajaxRequest('GET', 'save.php?id=' + this.id + '&value=' + this.value, callback);
+  },
+  cancel: function() {
+    this.convertToText();
+  },
+  convertToText: function() {
+    this.fieldElement.style.display = 'none';
+    this.saveButton.style.display = 'none';
+    this.cancelButton.style.display = 'none';
+    this.staticElement.style.display = 'inline';
+
+    this.setValue(this.value);
+  },
+  setValue: function(value) {
+    this.fieldElement.value = value;
+    this.staticElement.innerHTML = value;
+  },
+  getValue: function() {
+    return this.fieldElement.value;
+  }
+};
+```
+
+The mixin class holds nothing but the methods. To create a functional class, make a constructor and then call `augment`:
+
+```js
+/* EditInPlaceField class. */
+function EditInPlaceField(id, parent, value) {
+  this.id = id;
+  this.value = value;
+  this.parentElement = parent;
+
+  this.createElements(this.id);
+  this.attachEvents();
+};
+augment(EditInPlaceField, EditInPlaceMixin);
+```
+
+You can now instantiate the class in the exact same way as with classical inheritance. To create the class that uses a text field, you will not sublcass `EditInPlaceField`. Instead, simply create a new class (with a constructor) and augment it from the same mixin class. But before augmenting it, define a few methods. Since these are in place before augmenting it, they will not get overwritten.
+
+```js
+/* EditInPlaceArea class. */
+function EditInPlaceArea(id, parent, value) {
+  this.id = id;
+  this.value = value || 'default value';
+  this.parentElement = parent;
+
+  this.createElements(this.id);
+  this.attachEvents();
+};
+
+// Add certain methods so that augment won't include them.
+EditInPlaceArea.prototype.createElements = function(id) {
+  this.containerElement = document.createElement('div');
+  this.parentElement.appendChild(this.containerElement);
+
+  this.staticElement = document.createElement('p');
+  this.containerElement.appendChild(this.staticElement);
+  this.staticElement.innerHTML = this.value;
+
+  this.fieldElement = document.createElement('textarea');
+  this.fieldElement.value = this.value;
+  this.containerElement.appendChild(this.fieldElement);
+
+  this.saveButton = document.createElement('input');
+  this.saveButton.type = 'button';
+  this.saveButton.value = 'Save';
+  this.containerElement.appendChild(this.saveButton);
+
+  this.cancelButton = document.createElement('input');
+  this.cancelButton.type = 'button';
+  this.cancelButton.value = 'Cancel';
+  this.containerElement.appendChild(this.cancelButton);
+
+  this.convertToText();
+};
+EditInPlaceArea.prototype.convertToText = function() {
+  this.fieldElement.style.display = 'none';
+  this.saveButton.style.display = 'none';
+  this.cancelButton.style.display = 'none';
+  this.staticElement.style.display = 'none';
+
+  this.setValue(this.value);
+};
+
+augment(EditInPlaceArea, EditInPlaceMixin);
+```
+
+Mixin classes are good for sharing general purpose methods with disparate classes. For the examples, the mixin solution doesn't make much sense; because it is used to provide all the methods for two very similar classes
+
 ## When Should Inheritance Be Used?
 ...
 ## Summary
