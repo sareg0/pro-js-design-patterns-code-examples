@@ -172,16 +172,19 @@ Author.prototype.getName = function() {
   return name + ', Author of ' + this.getBooks().join(', ');
 }
 ```
+
 ## Prototypal Inheritance
+
 To learn prototypcal inheritance it is best to think only in terms of objects.
 
 The classical approach to creating an object is:
 
-  - a) define the structure of the object, using a class declaration
+- a) define the structure of the object, using a class declaration
 
-  - b) instantiate that class to create a new object.
+- b) instantiate that class to create a new object.
 
 Objects created in this manner:
+
 - have their own copies of all instance attributes
 - a link to a single the single copy of each of the instance methods.
 
@@ -201,7 +204,7 @@ var Person = {
 
 `Person` is now an object literal, and the _**prototype object**_ for other `Person`-like objects that you want to create.
 
-Methods of the prototype will most likely never change, but the attributes almost certainly will be:
+Methods of the prototype will most likely never change, but the attributes almost certainly will:
 
 ```js
 var reader = clone(Person);
@@ -262,7 +265,7 @@ One must create new copies of all arrays and objects before changing their membe
 
 You can use the `hasOwnProperty` method to help distinguish between inherited members and the object's actual members.
 
-Sometimes _**prototype objects**_ have child objects within them. To alter a single value within a child object, you have to recreate the entire thing. This would mean recreating it, and the cloned object would need to know about the structure and defaults for each child. In order to keep all objects as loosely coupled as possible. any complex child objects should be created using methods:
+Sometimes _**prototype objects**_ have child objects within them. To alter a single value within a child object, you have to recreate the entire thing. This would mean recreating it, and the cloned object would need to know about the structure and defaults for each child. In order to keep all objects as loosely coupled as possible, any complex child objects should be created using methods:
 
 ```js
 var CompoundObject = {
@@ -839,6 +842,27 @@ augment(EditInPlaceArea, EditInPlaceMixin);
 Mixin classes are good for sharing general purpose methods with disparate classes. For the examples, the mixin solution doesn't make much sense; because it is used to provide all the methods for two very similar classes
 
 ## When Should Inheritance Be Used?
-...
+Simple programs rarely require abstracting a class.
+Only use inheritance if the benefit of re-use and organisation, outweighs the added complexity.
+
+Prototypal inheritance (with the `clone` function) is best used in situations where memory efficiency is important.
+
+Classical Inheritance (with the `extend` function) is best used in when the programmers dealing with the objects are fmiliar with how inheritance works in other object-oriented languages.
+
+Both classical and prototypal inheritance are well suited for class heirarchies when the differences between each class are slight. If classes are very different from each other, it usually makes more sense to augment them with methods from mixin classes.
+
 ## Summary
-...
+Classical inheritance emulates the way classes inherit from each other in other object oriented languages such as C++ and Java. It is suited for situations when memory efficiency is not an issues, or programmers are not familiar with prototypal inheritance. Confusion surrounding subclassing can be reduced using the `extend` function.
+
+Prototypal inheritance works by creating objects and then cloning them. The objects it creates tend to be memory efficient, due to the fact that attributes and methods are shared until they are overwritten. There can be confusion surrounding cloned objects that contain arrays or objects as attributes. The `clone` function takes care of all the steps in creating a cloned object.
+
+Mixin classes provide a way to have objects and classes share methods without being in a parent-child relationship. It should be used where you have general-purpose methods that you want to share to dissimilar classes. It is possible to share all of the methods in a mixin class, or just a few of them, using the `augment` function.
+
+Using these three techniques it is possible to create complex object heirarchies that rival any other object oriented language in its elegance.
+
+Inheritance in JavaScript is:
+
+- not obvious or intuitive to the novice programmer.
+- an advanced technique that benefits from low-level study of the language
+- can be made more simple through convenience functions
+- ideal for creating APIs for other programmers to use.
